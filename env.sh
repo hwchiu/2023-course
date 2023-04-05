@@ -90,11 +90,15 @@ elif [[ "$1" == "delete" ]]; then
 elif [[ "$1" == "verify" ]]; then
 	echo "Verify cluster setup"
 	verify_k8s
+elif [[ "$1" == "clean" ]]; then
+	echo "Verify cluster setup"
+	clean
 else
 	echo "Usage:"
 	echo "  $0 install -- Download needed tools and env setup"
 	echo "  $0 create -- setup a KIND cluster"
 	echo "  $0 delete -- delete a KIND cluster"
+	echo "  $0 verify -- deploy testing application to verify basic components"
 	echo "  $0 clean -- clean environment, tools, config...etc"
 	exit 1
 fi
