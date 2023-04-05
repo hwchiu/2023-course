@@ -68,6 +68,10 @@ function verify_k8s()
 	echo "Verify Network Access, NodrPort"
 	curl -s localhost:8080 | grep "nginx test"
 	echo "Verify Network Access, Ingress"
+	kubectl wait --namespace ingress-nginx \
+		--for=condition=ready pod \
+		--selector=app.kubernetes.io/component=controller \
+		--timeout=90s
 	curl -s myserver.hwchiu.com| grep "nginx test"
 
 	echo "Removing testing applications"
@@ -91,7 +95,7 @@ elif [[ "$1" == "verify" ]]; then
 	echo "Verify cluster setup"
 	verify_k8s
 elif [[ "$1" == "clean" ]]; then
-	echo "Verify cluster setup"
+	echo "Remove installed tools"
 	clean
 else
 	echo "Usage:"
