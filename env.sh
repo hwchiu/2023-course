@@ -48,7 +48,7 @@ function delete_kind()
 
 function verify_k8s()
 {
-	kubectl apply -f test                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    [22/3030]
+	kubectl apply -f test
 	kubectl wait deployment/hwchiu-deployment --for=condition=available --timeout=5m
 
 	number_of_sts=$(kubectl get statefulsets web -o jsonpath='{.spec.replicas}')
