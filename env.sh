@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+function error()
+{
+	echo "------------Failed ---------------"
+	echo "$1"
+	echo "----------------------------------"
+	exit 1
+}
+
 function tool_download()
 {
 	# Download KIND
@@ -14,8 +22,7 @@ function tool_download()
 		kind version
 		kubectl version --client=true
 	else
-		echo "Download fail, sha256 mismatch"
-		exit 1
+		error "Download fail, sha256 mismatch"
 	fi
 
 	rm -f kind
@@ -48,16 +55,30 @@ function delete_kind()
 
 function verify_k8s()
 {
-	kubectl apply -f test
+	kubectl apply -f test/ingress-nginx || error "Failed to deploy ingress"
+	kubectl wait --namespace ingress-nginx \
+		--for=condition=ready pod \
+		--selector=app.kubernetes.io/component=controller \
+		--timeout=90s
+
+	kubectl apply -f test || error "Failed to deploy application"
 	kubectl wait deployment/hwchiu-deployment --for=condition=available --timeout=5m
 
 	number_of_sts=$(kubectl get statefulsets web -o jsonpath='{.spec.replicas}')
 	echo $number_of_sts
+	start_time=$(date +%s)
+	timeout=240
 	while true; do
 		if [[ $number_of_sts == $(kubectl get pods --selector app=nginx | grep Running | wc -l) ]]; then
 			echo "condition met"
 			break
 		fi
+		current_time=$(date +%s)
+		elapsed_time=$((current_time - start_time))
+		if [ $elapsed_time -gt $timeout ]; then
+			error "Error: Timeout exceeded for statefulset waiting"
+		fi
+		echo "StatefulSet not ready, sleep 5s"
 		sleep 5
 	done
 
@@ -75,7 +96,7 @@ function verify_k8s()
 	curl -s myserver.hwchiu.com| grep "nginx test"
 
 	echo "Removing testing applications"
-	kubectl delete -f test
+	kubectl delete -Rf test
 	kubectl delete pvc --all
 	echo "-------------------------------------"
 	echo "---- Pass Cluster Verification ------"
