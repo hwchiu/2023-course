@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hwchiu-deployment
+spec:
+  selector:
+    matchLabels:
+      app: hwchiu
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hwchiu
+    spec:
+      containers:
+      - name: hwchiu
+        image: hwchiu/netutils:latest

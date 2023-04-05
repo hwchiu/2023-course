@@ -65,6 +65,24 @@ function delete_kind()
   kind get clusters
 }
 
+function verify_k8s()
+{
+ kubectl apply -f test
+ kubectl wait deployment/hwchiu-deployment --for=condition=available --timeout=5m
+
+ number_of_sts=$(kubectl get statefulsets web -o jsonpath='{.status.readyReplicas}')
+ while true; do
+   if [[ $number_of_sts == $(kubectl get pods --selector app=nginx | grep Running | wc -l) ]]; then
+     echo "condition met"
+     break
+   fi
+   sleep 5
+  done
+
+  kubectl delete -f test
+  kubectl delete pvc --all
+}
+
 if [[ "$1" == "install" ]]; then
   echo "Installing reqired files"
   tool_download
@@ -75,6 +93,9 @@ elif [[ "$1" == "create" ]]; then
 elif [[ "$1" == "delete" ]]; then
   echo "Deleting KIND cluster k8slab"
   delete_kind
+elif [[ "$1" == "verify" ]]; then
+  echo "Verify cluster setup"
+  verify_k8s
 else
   echo "Usage:"
   echo "  $0 install -- Download needed tools and env setup"
