@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: www-server
+          image: hwchiu/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"
+          env:
+            - name: REDIS_HOST
+              value: "my-redis.default"
+            - name: USE_REDIS
+              value: "true"
+            - name: SERVER_PORT
+              value: "5000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+spec:
+  selector:
+    app: server
+  ports:
+  - name: server
+    port: 5000
+    targetPort: 5000
+    nodePort: 30010
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-redis
+spec:
+  selector:
+    matchLabels:
+      app: my-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:6.0.9
+        ports:
+        - containerPort: 6379
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-redis
+spec:
+  selector:
+    app: my-redis
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+  type: ClusterIP
