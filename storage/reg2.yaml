@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: private-reg-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: private-reg-2
+  template:
+    metadata:
+      labels:
+        app: private-reg-2
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: secret-demo-2-server
+          image: registry.hwchiu.com/demo/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJodHRwczovL3JlZ2lzdHJ5Lmh3Y2hpdS5jb20iOnsidXNlcm5hbWUiOiJyb2JvdCRkZW1vK3JvYm90IiwicGFzc3dvcmQiOiJXVHlBYXpKaU16OUk5M2w4WTVPTmVvb2M1VlFFZ2REaSIsImF1dGgiOiJjbTlpYjNRa1pHVnRieXR5YjJKdmREcFhWSGxCWVhwS2FVMTZPVWs1TTJ3NFdUVlBUbVZ2YjJNMVZsRkZaMlJFYVE9PSJ9fX0=
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: registry-secret
+type: kubernetes.io/dockerconfigjson

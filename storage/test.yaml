@@ -1,0 +1,55 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: nginx
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  selector:
+    # 必須與 ".spec.template.metadata.labels" 相同
+    matchLabels:
+      app: nginx
+  serviceName: "nginx"
+  replicas: 3
+  template:
+    metadata:
+      # 必須與 ".spec.selector.matchLabels" 相同
+      labels:
+        app: nginx
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: nginx
+        image: k8s.gcr.io/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: web
+        # 指定將 pvc 掛載到特定的目錄上
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  # 使用 persistent volume 來確保資料不會因為 pod reschedule 而消失
+  # 以下是使用 volumeClaimTemplates + StorageClass 來完成
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # 在本實驗環境中已經架設好一個 GlusterFS cluster + Heketi，並設定好 StorageClass
+      storageClassName: "my-gfs-storageclass"
+      resources:
+        requests:
+          storage: 1Gi

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: empty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: empty
+  template:
+    metadata:
+      labels:
+        app: empty
+    spec:
+      containers:
+        - name: empty-server
+          image: hwchiu/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"
+          volumeMounts:
+          - name: cache-volume
+            mountPath: "/config"
+        - name: data-generate
+          image: hwchiu/netutils
+          command: ["/bin/sh", "-c"]
+          args:
+          - |
+            while true; do
+              echo "$(date) - New data entry" >> /data/data.txt
+              sleep 10
+            done
+          volumeMounts:
+          - name: cache-volume
+            mountPath: "/data"
+      volumes:
+        - name: cache-volume
+          emptyDir: {}

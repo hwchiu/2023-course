@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: private-reg
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reg
+  template:
+    metadata:
+      labels:
+        app: reg
+    spec:
+      containers:
+        - name: www-server
+          image: registry.hwchiu.com/demo/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"
