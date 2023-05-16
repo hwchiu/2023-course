@@ -6,6 +6,6 @@ services:
       - "5050:5000"
     environment:
       REDIS_HOST: redis
-      USE_REDIS : true
+      USE_REDIS : "true"
   redis:
     image: "redis:6.0.9"
