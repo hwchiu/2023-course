@@ -8,9 +8,9 @@ rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["pods"]
   verbs: ["get", "watch", "list"]
-- apiGroups: [""] 
-  resources: ["services"]
-  verbs: ["get", "watch", "list"]
+  #- apiGroups: [""] 
+  #  resources: ["services"]
+  #  verbs: ["get", "watch", "list"]
 ---
 apiVersion: v1
 kind: ServiceAccount

@@ -1,0 +1,340 @@
+P.62
+kubectl version
+
+P.68
+kubectl config view
+
+P.70
+docker ps | grep kind
+kubectl cluster-info
+
+P.71
+docker exec -it k8slab-control-plane bash
+
+P.72
+kubectl get pods -A
+
+P.75
+kubectl explain nodes
+kubectl explain pods
+kubectl api-resources
+ 
+
+P.76
+./env.sh delete
+./env.sh create
+
+ 
+P.85
+kubectl explain pod.spec
+
+ 
+P.87
+cat pod.yaml
+kubectl apply -f pod.yaml
+ 
+
+P.88
+kubectl get pods 
+kubectl get pods -o wide 
+kubectl get pods -o yaml 
+kubectl delete -f pod.yaml 
+kubectl delete pod pod-example
+
+P.89
+
+kubectl describe pod pod-example
+kubectl exec -it pod-example -- bash
+kubectl logs pod-example
+kubectl logs -f pod-example
+kubectl logs --since=5m pod-example
+ 
+
+P.91
+kubectl apply -f pod2.yaml
+kubectl describe pod pod-fail
+kubectl get pods
+
+
+P.92
+kubectl apply -f pod3.yaml
+kubectl logs pod-crash
+kubectl get pods
+kubectl describe pod pod-crash
+
+P.93
+kubectl apply -f pod4.yaml
+docker exec k8slab-worker curl 10.244.1.3:5000
+ 
+P.94
+kubectl port-forward pod/pod-example 8888:5000
+curl localhost:8888 
+
+P.95
+kubectl apply -f pod4.yaml 
+
+P.102
+kubectl apply -f  deployment.yaml
+kubectl get pods
+kubectl delete pod xxxx
+kubectl get pod -w
+
+P.103
+kubectl describe nodes
+
+P.104
+kubectl apply -f node_selector.yaml
+kubectl label node k8slab-worker env=test
+kubectl label node k8slab-worker env-
+
+P.114
+kubectl get pods,deployment,replicaset
+
+P.115
+kubectl rollout undo deployment/www-deployment
+
+
+P.118
+kubectl apply -f ds.yaml
+kubectl get ds
+kubectl get pods
+
+P.120
+kubectl describe node k8slab-control-plane
+
+P.121
+kubectl taint nodes k8slab-control-plane node-role.kubernetes.io/control-plane:NoSchedule-
+kubectl taint nodes k8slab-control-plane node-role.kubernetes.io/control-plane:NoSchedule
+
+P.122
+kubectl apply -f ds_taint.yaml
+
+P.125
+kubectl apply -f job1.yaml
+kubectl get pods,jobs
+
+P.126
+kubectl apply -f job_fail.yaml
+
+P.127
+kubectl apply -f job_parallel.yaml
+
+P.134
+kubectl apply -f sts.yaml
+
+P.139
+kubectl apply -f deployment_startup.yaml
+kubectl describe pod  xxxx
+
+P.142
+kubectl apply -f deployment_liveness.yaml
+kubectl describe pod  xxxx
+
+P.145
+kubectl apply -f deployment_commands.yaml
+
+P.146
+kubectl get ns
+kubectl -n default get pods
+kubectl -n kube-system get pods
+
+P.147
+kubectl create ns ns-1
+kubectl -n ns-1 apply -f .
+kubectl -n ns-1 get pods
+kubectl get pods -A
+kubectl -n ns-1 delete .
+
+P.158
+kubectl apply -f resource.yaml
+kubectl describe nodes
+kubectl apply -f resource2.yaml
+kubectl get pods
+kubectl describe pod xxxx
+
+P.167
+kubectl get nodes -ojsonpath='{.items[*].status.allocatable}'
+
+
+P.194
+cd network
+kubectl apply -f service1.yaml
+kubectl apply -f debug.yaml
+
+P.196
+kubectl exec debug -- nslookup redis
+kubectl exec debug -- nslookup redis.default
+kubectl get endpoints
+kubectl get service
+kubectl get pods
+
+P.197
+kubectl exec -it .... Bash
+curl headless-example
+kubectl create ns haha
+kubectl -n haha apply -f service1.yaml
+
+P.198
+kubectl apply -f service2.yaml
+kubectl exec -it debug bash
+nslookup redis2
+
+P.203
+kubectl port-forward svc/redis 6380:6379
+nc -zv localhost 6380
+
+P.207
+kubectl apply -f service3.yaml
+docker inspect k8slab-worker
+nc -zv 172.18.0.4 30007
+
+P.210
+kubectl delete -f .
+kubectl apply -f example.yaml
+kubectl apply -f debug.yaml
+
+
+P.212
+kubectl exec -it debug bash
+redis-cli -h my-redis
+KEYS *
+Get message
+curl server:5000/message
+
+P.233
+kubectl apply -f test/ingress-nginx/
+kubectl -n ingress-nginx get pods,svc
+curl localhost
+
+P.235
+curl myserver.hwchiu.com/message
+curl myserver.hwchiu.com
+
+P.239
+kubectl apply -f deployment_probe.yaml
+kubectl get pod
+kubectl get endpoints
+kubectl describe pod 
+kubectl exec www-deployment-readiness-xxxxxx touch /tmp/haha
+
+P.254
+kubectl apply -f cm-1.yaml
+
+P.259
+kubectl get cm
+kubectl exec -it config-demo-1-xxxxx bash
+ls /config
+kubectl apply -f cm1.yaml
+
+P.266
+echo -n 'admin' | base64
+echo -n '1f2d1e2e67df' | base64
+kubectl create secret generic mysecret --dry-run=client -o yaml --from-literal=username=admin --from-literal=password=1f2d1e2e67df
+
+P.267
+echo -n "YWRtaW4=" | base64 -d
+echo -n "MWYyZDFlMmU2N2Rm" | base64 -d
+
+P.269
+kubectl apply -f secret-1.yaml
+kubectl get secret
+kubectl exec .... env
+
+
+P.278
+kubectl apply -f reg1.yaml
+kubectl describe pods xxx
+
+P.280
+kubectl apply -f reg2.yaml
+kubectl create secret docker-registry registry-secret --dry-run=client -o yaml --docker-username='robot$demo+robot' --docker-password='WTyAazJiMz9I93l8Y5ONeooc5VQEgdDi' --docker-server=https://registry.hwchiu.com
+
+P.281
+kubectl describe pods xxxx
+
+
+P.289
+kubectl apply -f empty.yaml
+kubectl exec -it ... -c $contaienr_name
+
+P.292
+kubectl apply -f hostpath.yaml
+docker exec -it k8slab-xxxx cat /data/data.txt
+
+P.308
+kubectl get sc
+kubectl describe sc
+kubectl -n local-path-storage logs -f xxx
+kubectl -n local-path-storage get pods
+
+P.309
+kubectl apply -f sc1.yaml
+
+P.313
+kubectl apply -f sc2.yaml
+
+
+P.325
+cd chart
+
+P.326
+helm install haha .
+helm install test .
+helm install -f myvalues.yaml test .
+helm install --set replicaCount=1 test .
+
+P.327
+helm ls
+helm template . 
+helm get values haha
+helm upgrade haha .
+helm delete haha
+
+P.329
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm search repo prometheus
+helm install prometheus prometheus-community/kube-prometheus-stack
+
+P.330
+kubectl port-forward --address 0.0.0.0 svc/prometheus-grafana 9090:80
+admin / prom-operator
+helm delete prometheus 
+
+
+P.336
+base64 -d | openssl x509 -text
+kubectl get clusterrolebindings -A -o yaml
+kubectl get clusterrolebindings -A -o json  | jq '.items[] | select(.subjects[0].name=="system:masters")'
+kubectl get clusterrole cluster-admin -o yaml
+
+P.340
+kubectl apply -f sa.yaml
+kubectl get sa,role,rolebinding
+
+P.341
+kubectl exec -it new-debug bash
+kubectl get pods
+kubectl get svc
+kubectl delete pods new-debug
+
+P.343
+kubectl auth can-i --as=system:serviceaccount:default:read-pod get svc
+kubectl auth can-i --as=system:serviceaccount:default:read-pod get pod
+
+P.347
+kubectl apply -f init.yaml
+kubectl logs -f xxxx -c my-init
+kubectl apply -f wait_me.yaml
+kubectl get pods -w 
+
+
+P.349
+kubectl apply -R -f .
+kubectl get pods -o json | jq '.items[].status.containerStatuses[].state'
+
+P.350
+kubectl explain pod.spec
+
+P.352
+kubectl apply -f delete.yaml
+kubectl apply -f delete_with_signal.yaml

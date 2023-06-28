@@ -24,6 +24,9 @@ function tool_download()
 	else
 		error "Download fail, sha256 mismatch"
 	fi
+	# Download jq
+	sudo apt-get update -y
+	sudo apt-get install -y jq
 
 	rm -f kind
 	rm -f kubectl
