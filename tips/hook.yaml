@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hook-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hook
+  template:
+    metadata:
+      labels:
+        app: hook
+    spec:
+      containers:
+        - name: ubuntu
+          image: hwchiu/netutils
+          command: ["/bin/sh"]
+          args: ["-c", "while true; do echo hello >> /hook; sleep 10;done"]
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - "bin/bash"
+                  - "-c"
+                  - "echo 'post-start-hook-handler' >> /hook"     
+            preStop:
+              exec:
+                command:
+                  - "bin/bash"
+                  - "-c"
+                  - "echo 'pre-stop-hook-handler' >> /hook"     

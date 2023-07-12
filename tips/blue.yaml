@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue
+spec:
+  selector:
+    matchLabels:
+      app: blue
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: blue
+    spec:
+      containers:
+        - name: server
+          image: hwchiu/python-example
+          ports:
+          - containerPort: 5000
+            name: app
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"

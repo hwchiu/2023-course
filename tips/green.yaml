@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green
+spec:
+  selector:
+    matchLabels:
+      app: green
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: green
+    spec:
+      containers:
+      - name: server
+        image: hwchiu/netutils:python
+        ports:
+        - containerPort: 8000
+          name: app
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gb-demo
+spec:
+  selector:
+    app: green
+          #    app: blue
+  ports:
+  - name: app
+    port: 80
+    targetPort: app
+  type: ClusterIP

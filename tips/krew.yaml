@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: krew-demo
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: krew-demo
+  template:
+    metadata:
+      labels:
+        app: krew-demo
+    spec:
+      containers:
+        - name: server-1
+          image: hwchiu/netutils
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "128m"              
+        - name: server-2
+          image: hwchiu/netutils
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "128m" 
+        - name: krew-demo-server
+          image: hwchiu/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"
+          env:
+            - name: uname
+              valueFrom:
+                secretKeyRef:
+                  name: krew-secret
+                  key: username
+          volumeMounts:
+          - name: config
+            mountPath: "/config"
+      volumes:
+        - name: config
+          secret:
+            secretName: krew-secret
+---
+apiVersion: v1
+data:
+  password: MWYyZDFlMmU2N2Rm
+  username: YWRtaW4=
+  key: MWEyYjNjNGQ1ZTZm
+  token: d2FoYWhhaGFoYWhhaA==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: krew-secret
