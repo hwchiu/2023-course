@@ -1,0 +1,7 @@
+apiVersion: hwchiu.io/v1alpha1
+kind: Class
+metadata:
+  name: firstclass
+spec:
+  classMode: "online"
+  number: 12

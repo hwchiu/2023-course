@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary
+spec:
+  selector:
+    matchLabels:
+      app: canary
+      version: v1
+  replicas: 6
+  template:
+    metadata:
+      labels:
+        app: canary
+        version: v1
+    spec:
+      containers:
+        - name: server
+          image: hwchiu/python-example:8000
+          ports:
+          - containerPort: 8000
+            name: app
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canary-v2
+spec:
+  selector:
+    matchLabels:
+      app: canary
+      version: v2
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: canary
+        version: v2
+    spec:
+      containers:
+      - name: server
+        image: hwchiu/netutils:python
+        ports:
+        - containerPort: 8000
+          name: app
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary-demo
+spec:
+  selector:
+    app: canary
+  ports:
+  - name: app
+    port: 80
+    targetPort: app
+  type: ClusterIP

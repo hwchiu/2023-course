@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-imagepullfail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argo-imagepullfail
+  template:
+    metadata:
+      labels:
+        app: argo-imagepullfail
+    spec:
+      containers:
+        - name: www-server
+          image: registry.hwchiu.com/demo/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"

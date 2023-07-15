@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-probefail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argo-probefail
+  template:
+    metadata:
+      labels:
+        app: argo-probefail
+    spec:
+      containers:
+        - name: server
+          image: hwchiu/netutils:python
+          ports:
+            - containerPort: 8000
+              name: python-port
+          readinessProbe:
+            httpGet:
+              path: /tmp/haha
+              port: python-port
+            failureThreshold: 3
+            periodSeconds: 2
+        - name: server2
+          image: hwchiu/python-example
+          ports:
+            - containerPort: 5000
+              name: server-port
+          livenessProbe:
+            httpGet:
+              path: /tmp/haha
+              port: server-port
+            failureThreshold: 3
+            periodSeconds: 2
+        - name: server3
+          image: nginx
+          ports:
+            - containerPort: 80
+              name: nginx-port
+          startupProbe:
+            httpGet:
+              path: /tmp/haha
+              port: nginx-port
+            failureThreshold: 3
+            periodSeconds: 2

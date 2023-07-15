@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: app-failure
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - path: app-failure/crashloopback
+        name: crashloopback
+      - path: app-failure/image_pull_fail
+        name: imagepull
+      - path: app-failure/invalid_yaml
+        name: invalid
+      - path: app-failure/noconfig
+        name: noconfig
+      - path: app-failure/probe
+        name: probe
+  template:
+    metadata:
+      name: 'demo-{{name}}'
+    spec:
+      project: default
+      syncPolicy:
+        automated: {}
+      source:
+        repoURL: http://gitea-http.gitea:3000/hwchiu/k8s-app
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        namespace: app
+        server: https://kubernetes.default.svc

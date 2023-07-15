@@ -1,6 +1,6 @@
 
-DOCKER_IMAGE_NAME=hwchiu/python-example
-DOCKER_IMAGE_TAG=latest
+DOCKER_IMAGE_NAME:=hwchiu/python-example
+DOCKER_IMAGE_TAG:=latest
 
 .PHONY: build push clean
 build: ## build docker images

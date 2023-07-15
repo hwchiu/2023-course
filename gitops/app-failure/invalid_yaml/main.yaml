@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-invalid-config
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argo-invalid-config
+  template:
+    metadata:
+      labels:
+        app: argo-invalid-config
+    spec:
+      containers:
+        - name: www-server
+          image: hwchiu/python-example
+          ports:
+            - Yo: "TCP"

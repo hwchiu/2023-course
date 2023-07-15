@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-crash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argo-crash
+  template:
+    metadata:
+      labels:
+        app: argo-crash
+    spec:
+      containers:
+        - name: www-server
+          image: hwchiu/python-example
+          command: ["/bin/sh"]
+          args: ["-c", "while true; do echo hello; non sleep 10;done"]
