@@ -28,6 +28,9 @@ function tool_download()
 	sudo apt-get update -y
 	sudo apt-get install -y jq
 
+        # Instasll Helm
+	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
 	rm -f kind
 	rm -f kubectl
 }
@@ -106,6 +109,20 @@ function verify_k8s()
 	echo "-------------------------------------"
 }
 
+
+function prepare_env()
+{
+  kubectl apply -f env/ns.yaml
+  kubectl -n monitoring apply -f env/argocd.yaml
+  kubectl -n monitoring apply -f env/gitea.yaml
+
+  helm repo add --force-update metrics-server https://kubernetes-sigs.github.io/metrics-server/
+  helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
+  helm repo update
+  helm -n monitoring upgrade --install --set args="{--kubelet-insecure-tls}" metrics-server metrics-server/metrics-server --version 3.10.0
+  helm -n monitoring upgrade --install prometheus --set prometheus.service.type=NodePort --set prometheus.service.nodePort=30003 --set grafana.service.type=NodePort --set grafana.service.nodePort=30004 prometheus-community/kube-prometheus-stack --version v48.1.1
+}
+
 if [[ "$1" == "install" ]]; then
 	echo "Installing reqired files"
 	tool_download
@@ -121,6 +138,9 @@ elif [[ "$1" == "verify" ]]; then
 elif [[ "$1" == "clean" ]]; then
 	echo "Remove installed tools"
 	clean
+elif [[ "$1" == "set_env" ]]; then
+	echo "Preconfigure the environment"
+	prepare_env
 else
 	echo "Usage:"
 	echo "  $0 install -- Download needed tools and env setup"
@@ -128,5 +148,6 @@ else
 	echo "  $0 delete -- delete a KIND cluster"
 	echo "  $0 verify -- deploy testing application to verify basic components"
 	echo "  $0 clean -- clean environment, tools, config...etc"
+	echo "  $0 set_env -- preconfigure environment"
 	exit 1
 fi
