@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  podaff-3
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: podaff-3
+  template:
+    metadata:
+      labels:
+        app: podaff-3
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - podaff-4
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - name: podaff-3-server
+          image: hwchiu/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"

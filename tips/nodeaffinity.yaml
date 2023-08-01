@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  nodeaffinity
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: nodeaffinity
+  template:
+    metadata:
+      labels:
+        app: nodeaffinity
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 4
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - k8slab-worker
+          - weight: 9
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - k8slab-worker2
+
+      containers:
+        - name: nodeaffinity-server
+          image: hwchiu/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"

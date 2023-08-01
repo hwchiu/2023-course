@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  podaff-4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: podaff-4
+  template:
+    metadata:
+      labels:
+        app: podaff-4
+    spec:
+      containers:
+        - name: podaff-4-server
+          image: hwchiu/python-example
+          ports:
+            - containerPort: 5000
+              protocol: "TCP"
