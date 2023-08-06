@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rollout-gb
+  namespace: monitoring
+spec:
+  destination:
+    namespace: app
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: http://gitea-http:3000/course/k8s-app
+    targetRevision: HEAD
+    path:  rollout/green-blue/
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true    
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rollout-canary
+  namespace: monitoring
+spec:
+  destination:
+    namespace: app
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: http://gitea-http:3000/course/k8s-app
+    targetRevision: HEAD
+    path:  rollout/canary/
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true    

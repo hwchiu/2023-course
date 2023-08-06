@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rollout-apps
+spec:
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: rollout
+    repoURL: 'http://gitea-http:3000/course/k8s-app'
+    targetRevision: HEAD
+  syncPolicy:
+    automated: {}

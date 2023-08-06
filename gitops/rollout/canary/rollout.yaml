@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-canary
+spec:
+  replicas: 10
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause: {}
+      - setWeight: 40
+      - pause: {}
+      - setWeight: 60
+      - pause: {}
+      - setWeight: 80
+      - pause: {duration: 60}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: rollouts-canary
+  template:
+    metadata:
+      labels:
+        app: rollouts-canary
+    spec:
+      containers:
+      - name: rollouts-canary
+        #image: hwchiu/netutils:python
+        image: hwchiu/python-example
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollouts-canary
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: rollouts-canary
