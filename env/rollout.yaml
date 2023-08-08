@@ -15094,11 +15094,13 @@ metadata:
     app.kubernetes.io/part-of: argo-rollouts
   name: argo-rollouts-metrics
 spec:
+  type: NodePort
   ports:
   - name: metrics
     port: 8090
     protocol: TCP
     targetPort: 8090
+    nodePort: 30005
   selector:
     app.kubernetes.io/name: argo-rollouts
 ---

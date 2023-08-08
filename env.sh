@@ -130,6 +130,7 @@ function prepare_env()
   kubectl apply -f env/ns.yaml
   kubectl -n monitoring apply -f env/argocd.yaml
   kubectl -n monitoring apply -f env/gitea.yaml
+  kubectl -n monitoring apply -f env/rollout.yaml
 
   helm repo add --force-update metrics-server https://kubernetes-sigs.github.io/metrics-server/
   helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
