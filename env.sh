@@ -137,6 +137,8 @@ function prepare_env()
   helm repo update
   helm -n monitoring upgrade --install --set args="{--kubelet-insecure-tls}" metrics-server metrics-server/metrics-server --version 3.10.0
   helm -n monitoring upgrade --install prometheus --set prometheus.service.type=NodePort --set prometheus.service.nodePort=30003 --set grafana.service.type=NodePort --set grafana.service.nodePort=30004 prometheus-community/kube-prometheus-stack --version v48.1.1
+
+  bash vpa.sh
 }
 
 if [[ "$1" == "install" ]]; then
