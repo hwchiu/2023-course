@@ -1,4 +1,7 @@
 from flask import Flask, jsonify, request
+from prometheus_client import Counter, generate_latest, Gauge, Histogram
+import random
+import time
 import os
 import redis
 
@@ -6,7 +9,6 @@ app = Flask(__name__)
 
 USE_REDIS = os.environ.get('USE_REDIS', False)
 REDIS_HOST = os.environ.get('REDIS_HOST', "127.0.0.1")
-SERVER_PORT = os.environ.get('SERVER_PORT', 5000)
 
 if USE_REDIS:
     try:
@@ -38,11 +40,32 @@ def message():
 
 @app.route("/")
 def home():
+    # 增加請求計數
+    REQUEST_COUNT.labels(product="demo").inc()
     return "Hello, Docker!"
+
+@app.route("/api2")
+def gauge():
+    RANDOM_NUMBER.set(random.randint(0,500)) 
+    return "Hi, Gauge Demo"
+
+@app.route("/api3")
+def histogram():
+    REQUEST_LATENCY.observe(random.uniform(0,10.0)) 
+    return "Hi, Histogram Demo"
+
+@app.route('/metrics')
+def metrics():
+    return generate_latest()
 
 @app.route("/api/v1/hello")
 def hello():
     return jsonify({"message": "Hello, API!"})
 
+# 定義一個 Counter 指標
+REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['product'])
+RANDOM_NUMBER = Gauge('my_random_number', 'Random Number')
+REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency in seconds')
+
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=SERVER_PORT)
+    app.run(debug=True, host='0.0.0.0', port=5000)
