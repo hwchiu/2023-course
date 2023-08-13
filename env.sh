@@ -30,6 +30,7 @@ function tool_download()
 
         # Instasll Helm
 	curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.18.2 TARGET_ARCH=x86_64 sh -
 
 	rm -f kind
 	rm -f kubectl
@@ -139,6 +140,7 @@ function prepare_env()
   helm -n monitoring upgrade --install prometheus --set prometheus.service.type=NodePort --set prometheus.service.nodePort=30003 --set grafana.service.type=NodePort --set grafana.service.nodePort=30004 prometheus-community/kube-prometheus-stack --version v48.1.1
 
   bash vpa.sh
+  kubectl -n monitoring get secrets argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d > /tmp/argo
 }
 
 if [[ "$1" == "install" ]]; then
