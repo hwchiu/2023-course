@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-example
+spec:
+  selector:
+    matchLabels:
+      app: istio-example
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: istio-example
+    spec:
+      containers:
+        - name: server
+          image: hwchiu/python-example
+          ports:
+          - containerPort: 5000
+            name: app
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            failureThreshold: 3
+            periodSeconds: 2
+          startupProbe:
+            httpGet:
+              path: /
+              port: 5000
+            failureThreshold: 3
+            periodSeconds: 4
+          readinessProbe:
+            tcpSocket:
+              port: 5000
+            failureThreshold: 3
+            periodSeconds: 2
+

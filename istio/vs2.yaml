@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appv1
+spec:
+  selector:
+    matchLabels:
+      version: appv1
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        version: appv1
+    spec:
+      containers:
+      - name: server
+        image: hwchiu/python-example:8000
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appv2
+spec:
+  selector:
+    matchLabels:
+      version: appv2
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        version: appv2
+    spec:
+      containers:
+      - name: server
+        image: hwchiu/netutils:python
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appv1
+spec:
+  selector:
+    version: appv1
+  ports:
+  - name: server
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appv2
+spec:
+  selector:
+    version: appv2
+  ports:
+  - name: server
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  selector: {}
+  ports:
+  - name: server
+    port: 80
+    targetPort: 8000
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: app
+spec:
+  hosts:
+  - app
+  http:
+  - match:
+    - uri:
+        prefix: "/test"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: appv1
+  - route:
+    - destination:
+        host: appv1
+      weight: 80
+    - destination:
+        host: appv2
+      weight: 20

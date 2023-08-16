@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: v1
+spec:
+  selector:
+    matchLabels:
+      version: v1
+      app: demo
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        version: v1
+        app: demo
+    spec:
+      containers:
+      - name: server
+        image: hwchiu/python-example:8000
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: v2
+spec:
+  selector:
+    matchLabels:
+      version: v2
+      app: demo
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        version: v2
+        app: demo
+    spec:
+      containers:
+      - name: server
+        image: hwchiu/netutils:python
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-app
+spec:
+  selector:
+    app: demo
+  ports:
+  - name: server
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: demo-app
+spec:
+  gateways:
+  - mesh
+  - istio-system/demo-gw
+  hosts:
+  - demo-app
+  - demo.hwchiu.com
+  http:
+  - match:
+    - uri:
+        prefix: "/test"
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: demo-app
+        subset: v1
+  - route:
+    - destination:
+        host: demo-app
+        subset: v2
+      weight: 20
+    - destination:
+        host: demo-app
+        subset: v1
+      weight: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: demo-app
+spec:
+  host: demo-app
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: demo-gw
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - demo.hwchiu.com
