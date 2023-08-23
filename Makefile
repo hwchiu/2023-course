@@ -13,5 +13,10 @@ push: build ## push docker image
 clean: ## clean docker images
 	docker rmi $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)
 
+deploy: ## deploy local application via KIND load
+	docker build -t localbuild/python-example:latest .
+	kind load docker-image localbuild/python-example:latest -n k8slab
+
+
 help: ## Print
 	@grep '^[[:alnum:]_-]*:.* ##' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.* ## "}; {printf "%-25s %s\n", $$1, $$2};'
