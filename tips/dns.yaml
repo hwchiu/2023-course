@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-policy-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dns-policy-app
+  template:
+    metadata:
+      labels:
+        app: dns-policy-app
+    spec:
+      containers:
+        - name: server
+          image: hwchiu/netutils
+      dnsPolicy: Default
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-dns-policy-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-dns-policy-app
+  template:
+    metadata:
+      labels:
+        app: custom-dns-policy-app
+    spec:
+      containers:
+        - name: busybox-container
+          image: hwchiu/netutils
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+        searches:
+          - hwchiu.com

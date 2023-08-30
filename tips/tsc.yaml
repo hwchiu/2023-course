@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: topology-spread-demo
+spec:
+  replicas: 8
+  selector:
+    matchLabels:
+      app: topology-spread-demo
+  template:
+    metadata:
+      labels:
+        app: topology-spread-demo
+    spec:
+      containers:
+        - name: server
+          image: hwchiu/netutils
+          imagePullPolicy: IfNotPresent
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: type
+        whenUnsatisfiable: DoNotSchedule
+        nodeTaintsPolicy: Ignore
+        labelSelector:
+          matchLabels:
+            app: topology-spread-demo
+            #      tolerations:
+            #      - key: node-role.kubernetes.io/control-plane
+            #        operator: Exists
+            #        effect: NoSchedule
