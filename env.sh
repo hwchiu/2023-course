@@ -143,6 +143,8 @@ function prepare_env()
   bash vpa.sh
 
   kubectl -n monitoring get secrets argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d > /tmp/argo
+
+  sleep 10
   kubectl apply -f env/metallb-ip.yaml
 }
 
