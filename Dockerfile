@@ -7,6 +7,7 @@ WORKDIR /app
 # Copy the requirements file to the container
 COPY requirements.txt ./
 
+RUN apt-get update -y && apt-get install -y curl jq
 # Install the required packages
 RUN pip install --no-cache-dir -r requirements.txt
 

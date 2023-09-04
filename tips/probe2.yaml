@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: probe2-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: probe2-demo
+  template:
+    metadata:
+      labels:
+        app: probe2-demo
+    spec:
+      containers:
+      - name: main-container
+        image: localbuild/python-example:latest
+        imagePullPolicy: Never
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - /app/check.sh
+          initialDelaySeconds: 5
+          periodSeconds: 10

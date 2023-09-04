@@ -49,6 +49,8 @@ function tool_download()
         export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
         echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> ~/.bashrc
         echo 'source ~/.config/envman/PATH.env' >> ~/.bashrc
+        git config --global user.name "course"
+	git config --global user.email "test@a.com"
 }
 
 function clean()
@@ -143,7 +145,6 @@ function prepare_env()
   bash vpa.sh
 
   kubectl -n monitoring get secrets argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d > /tmp/argo
-
   sleep 10
   kubectl apply -f env/metallb-ip.yaml
 }

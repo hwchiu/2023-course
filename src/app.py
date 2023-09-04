@@ -62,6 +62,12 @@ def metrics():
 def hello():
     return jsonify({"message": "Hello, API!"})
 
+@app.route("/health")
+def check():
+    # 增加請求計數
+    return "{\"message\":\"Hello, Docker!\"}"
+
+
 # 定義一個 Counter 指標
 REQUEST_COUNT = Counter('request_count', 'Total number of requests', ['product'])
 RANDOM_NUMBER = Gauge('my_random_number', 'Random Number')

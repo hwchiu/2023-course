@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: probe3-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: probe3-demo
+  template:
+    metadata:
+      labels:
+        app: probe3-demo
+    spec:
+      volumes:
+      - name: healthz
+        configMap: 
+          name: healthcheck
+          defaultMode: 0755
+      containers:
+      - name: main-container
+        image: localbuild/python-example:latest
+        imagePullPolicy: Never
+        volumeMounts:
+        - name: healthz
+          mountPath: /data
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - /data/check.sh
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+data:
+  check.sh: |
+    #!/bin/sh
+    curl -s localhost:5000/health | jq -e 'select(.message=="Hello, Docker!")'
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: healthcheck

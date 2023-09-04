@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: probe1-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: probe1-demo
+  template:
+    metadata:
+      labels:
+        app: probe1-demo
+    spec:
+      containers:
+      - name: main-container
+        image: hwchiu/python-example:probe
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - curl -s localhost:5000/health | jq -e 'select(.message=="Hello, Docker!")';
+          initialDelaySeconds: 5
+          periodSeconds: 10
